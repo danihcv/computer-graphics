@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_PREFIX_PATH "C:/mingw64")
 
-add_executable(projeto-ola "projeto - ola.cpp")
+add_executable(projeto-ola "ola.cpp")
 
 include_directories(C:/mingw64/include)
 

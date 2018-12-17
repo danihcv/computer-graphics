@@ -4,7 +4,7 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <GL/freeglut.h>  // GLUT, includes glu.h and gl.h
-#include "./rainbow.h"
+#include "../../rainbow.h"
 
 using namespace std;
 
