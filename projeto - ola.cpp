@@ -8,12 +8,13 @@
 
 using namespace std;
 
-const int width = 720, height = 480;
-const float frameTime = 1000.0f / 60.0f, v = 4.5f;
+const int width = 720, height = 250;
+const float frameTime = 1000.0f / 60.0f, v = 12;
 
 struct square {
    float x, y, edgeSize, R, G, B;
    int direction = 1;
+    bool canMove = false;
 };
 
 vector<square> blocks;
@@ -31,51 +32,53 @@ void drawSquare(float x, float y, float edgeSize, float R, float G, float B) {
 
 square createSquare() {
    square newBlock = square();
-   newBlock.x = 0;
-   newBlock.y = 0;
    newBlock.edgeSize = 40;
+   newBlock.x = 20 + blocks.size() * 50;
+   newBlock.y = 0;
    double color[3] = {};
-   srand(time(NULL));
-   int index = ((int) blocks.size() * 200 + rand() * 7) % rainbowSize;
+   srand((unsigned int) time(NULL));
+   int index = (int) ((blocks.size() * 200 + rand() * 7) % rainbowSize);
    memcpy(color, rainbowArray[index], sizeof(double) * 3);
-   newBlock.R = color[0];
-   newBlock.G = color[1];
-   newBlock.B = color[2];
+   newBlock.R = (float) color[0];
+   newBlock.G = (float) color[1];
+   newBlock.B = (float) color[2];
 
    return newBlock;
 }
 
 void scheduleUpdate(int useless) {
-   glutTimerFunc(frameTime, scheduleUpdate, 1);
+   glutTimerFunc((unsigned int) frameTime, scheduleUpdate, 1);
 
    for (int i = 0; i < (int) blocks.size(); i++) {
-      cout << "x: " << blocks[i].x << ", y: " << blocks[i].y << endl;
-      blocks[i].x += v;
-      blocks[i].y += v * 1.7f * blocks[i].direction;
+       if ((blocks[i].canMove && (i == 0 || blocks[i - 1].y >= 30)) || blocks[i].y != 0) {
+           blocks[i].y += v * blocks[i].direction;
 
-      if (blocks[i].x > width) {
-         blocks[i].x = 0;
-      }
+           if (blocks[i].y >= height - blocks[i].edgeSize) {
+               blocks[i].direction = -1;
+               blocks[i].y = height - blocks[i].edgeSize;
+               blocks[i].canMove = i == 0 ? false : blocks[i - 1].canMove;
+           } else if (blocks[i].y <= 0) {
+               blocks[i].direction = 1;
+               blocks[i].y = 0;
+           }
 
-      if (blocks[i].y >= height - blocks[i].edgeSize) {
-         blocks[i].direction = -1;
-      } else if (blocks[i].y <= 0) {
-         blocks[i].direction = 1;
-      }
-
-      cout << "   x: " << blocks[i].x << ", y: " << blocks[i].y << endl;
-   }
-
-   if ((int) blocks.size() == 0) {
-      blocks.push_back(createSquare());
-   } else {
-      square lastBlock = blocks[(int) blocks.size() - 1];
-      if ((int) blocks.size() < 7 && lastBlock.x > lastBlock.edgeSize + 10) {
-         blocks.push_back(createSquare());
-      }
+           cout << "   x: " << blocks[i].x << ", y: " << blocks[i].y << endl;
+       }
    }
 
    glutPostRedisplay();
+}
+
+void keyboardHandler(unsigned char key, int x, int y) {
+    switch (key) {
+        case ' ':
+            for (int i = 0; i < blocks.size(); i++) {
+                blocks[i].canMove = true;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void display() {
@@ -94,6 +97,11 @@ void init() {
 }
 
 int main(int argc, char** argv) {
+
+    for (int i = 0; i < 14; i++) {
+        blocks.push_back(createSquare());
+    }
+
    glutInit(&argc, argv);                 // Initialize GLUT
       glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
       glutInitWindowSize(width, height);   // Set the window's initial width & height
@@ -101,7 +109,8 @@ int main(int argc, char** argv) {
       glutCreateWindow("OpenGL Project - Wave"); // Create a window with the given title
       init();
    glutDisplayFunc(display); // Register display callback handler for window re-paint
-   glutTimerFunc(frameTime, scheduleUpdate, 1);
+   glutKeyboardFunc(keyboardHandler); // Register display callback handler for window re-paint
+   glutTimerFunc((unsigned int) frameTime, scheduleUpdate, 1);
    glutMainLoop();           // Enter the infinitely event-processing loop
    return 0;
 }
