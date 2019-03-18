@@ -2,7 +2,7 @@
 #include <GL/glut.h>
 
 static int year = 0, day = 0;
-
+float lx = 0, ly = 0, lz = 2;
 
 void init(void) {
     /* selecionar cor de fundo (preto) */
@@ -11,13 +11,14 @@ void init(void) {
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHT0);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
-    GLfloat lightPosition[] = {-1, -1, 0, 1};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 }
 
 // Funcao callback chamada para fazer o desenho
 void display(void) {
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+    GLfloat lightPosition[] = {lx, ly, lz, 1};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
 
@@ -25,7 +26,7 @@ void display(void) {
         glColor3f(1, 1, 0);
         glRotatef((GLfloat) year, 1.0, 0.0, 0.0);
         glRotatef((GLfloat) day, 0.0, 0.0, 1.0);
-        glutSolidSphere(1.0, 20, 16);    /* desenha o sol */
+        glutSolidSphere(1.0, 100, 100);    /* desenha o sol */
     glPopMatrix();
 
     glPushMatrix();
@@ -35,21 +36,21 @@ void display(void) {
         glPushMatrix();
             glColor3f(0, 0, 1);
             glRotatef((GLfloat) day, 0.0, 1.0, 0.0);
-            glutSolidSphere(0.2, 10, 8); /* planeta 1 */
+            glutSolidSphere(0.2, 50, 50); /* planeta 1 */
         glPopMatrix();
 
         glPushMatrix();
             glColor3ub(255, 0, 0);
             glRotatef((GLfloat) day, 0.0, 0.0, 1.0);
             glTranslatef(0.5, 0.0, 0.0);
-            glutSolidSphere(0.05, 10, 8); /* lua 1 */
+            glutSolidSphere(0.05, 50, 50); /* lua 1 */
         glPopMatrix();
 
         glPushMatrix();
             glColor3ub(0, 255, 0);
             glRotatef((GLfloat) day, 0.0, 1.0, 1.0);
             glTranslatef(0.4, 0, 0);
-            glutSolidSphere(0.025, 10, 8); /* lua 2 */
+            glutSolidSphere(0.025, 50, 50); /* lua 2 */
         glPopMatrix();
 
         glColor3ub(255, 255, 255);
@@ -92,6 +93,36 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 'Y':
             year = (year - 5) % 360;
+            glutPostRedisplay();
+            break;
+        case 'x':
+//            if (lx < 1)
+                lx += 0.1;
+            glutPostRedisplay();
+            break;
+        case 'X':
+//            if (lx > -1)
+                lx -= 0.1;
+            glutPostRedisplay();
+            break;
+        case 'z':
+            if (lz < 4)
+                lz += 0.1;
+            glutPostRedisplay();
+            break;
+        case 'Z':
+//            if (lz > -2)
+                lz -= 0.1;
+            glutPostRedisplay();
+            break;
+        case 'c':
+//            if (ly < 1)
+                ly += 0.1;
+            glutPostRedisplay();
+            break;
+        case 'C':
+//            if (ly > -1)
+                ly -= 0.1;
             glutPostRedisplay();
             break;
         case 27:
